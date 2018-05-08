@@ -1,13 +1,22 @@
 import game_engine
 from basic_game_algorithms import *
+from alpha_beta_algorithm import *
 from minimax_algorithm import *
+import queue
 
 
 class Cli:
     def __init__(self):
-        self.engine = game_engine.GameEngine(6)
-        self._ai_player = MiniMaxStrategy(self.engine.get_board(), 1)
-        self._ai_opponent = MiniMaxStrategy(self.engine.get_board(), 2)
+        self.engine = game_engine.GameEngine(4)
+        self._ai_players = queue.Queue(2)
+
+        #self._ai_players.put(AlphaBetaStrategy(self.engine.get_board(), 1))
+        self._ai_players.put(AlphaBetaStrategy(self.engine.get_board(), 1))
+
+        self._ai_players.put(MiniMaxStrategy(self.engine.get_board(), 1))
+        #self._ai_players.put(MiniMaxStrategy(self.engine.get_board(), 1))
+
+        self._current_player = self._ai_players.get()
 
     def run(self):
         while self.engine.is_game_over():
@@ -18,11 +27,11 @@ class Cli:
             # while not self.engine.make_move(move):
             #     print("Invalid move, try again")
             #     move = self.get_user_input()
-            player_move = self._ai_player.make_move()
+            player_move = self._current_player.make_move()
             self.engine.make_move(player_move)
 
-            opponent_move = self._ai_opponent.make_move()
-            self.engine.make_move(opponent_move)
+            self._ai_players.put(self._current_player)
+            self._current_player = self._ai_players.get()
 
         board = self.engine.get_board()
         points = self.engine.get_player_points()

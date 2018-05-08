@@ -10,11 +10,12 @@ class MiniMaxStrategy:
         self._heuristic_evaluator = heuristic_evaluator.HeuristicEvaluator()
 
     def make_move(self):
-        return self._minimax(self._game_board, self._search_depth, True)
+        move, _ = self._mini_max(self._game_board, self._search_depth, True)
+        return move
 
-    def _minimax(self, board, depth, max_turn, move=None):
+    def _mini_max(self, board, depth, max_turn, move=None):
         if depth <= 0:
-            return self._heuristic_evaluator.evaluate_heuristic_score(board, move)
+            return move, self._heuristic_evaluator.evaluate_heuristic_score(board, move)
         if move is not None:
             board[move] = 1
 
@@ -23,13 +24,15 @@ class MiniMaxStrategy:
         scores = []
         for move in valid_moves:
             board_copy = np.copy(self._game_board)
-            scores.append(self._minimax(board_copy, depth - 1, not max_turn, move))
+            scores.append(self._mini_max(board_copy, depth - 1, not max_turn, move)[1])
 
         if len(valid_moves) == 1:
-            return valid_moves[0]
+            return valid_moves[0], scores[0]
         if max_turn:
-            return valid_moves[np.argmax(scores)]
+            max_index = np.argmax(scores)
+            return valid_moves[max_index], scores[max_index]
         else:
-            return valid_moves[np.argmin(scores)]
+            min_index = np.argmin(scores)
+            return valid_moves[min_index], scores[min_index]
 
 
