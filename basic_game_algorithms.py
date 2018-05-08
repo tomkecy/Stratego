@@ -1,4 +1,6 @@
 import random
+import numpy as np
+
 import points_counter
 
 
@@ -23,12 +25,9 @@ class OptimisedRandomStrategy:
 
     def make_move(self):
         board_size = len(self._game_board)
-        valid_moves = []
-        for i in range(board_size):
-            for j in range(board_size):
-                if self._game_board[i, j] == 0:
-                    valid_moves.append((i, j))
+        valid_moves = [x for x in np.ndindex(board_size, board_size) if self._game_board[x] == 0]
         for move in valid_moves:
             if self._points_counter.count_move_points(move) > 0:
                 return move
         return random.choice(valid_moves)
+
