@@ -31,3 +31,18 @@ class OptimisedRandomStrategy:
                 return move
         return random.choice(valid_moves)
 
+
+class LocalBestStrategy:
+    def __init__(self, game_board):
+        self._game_board = game_board
+        self._points_counter = points_counter.PointsCounter(game_board)
+
+    def make_move(self):
+        board_size = len(self._game_board)
+        valid_moves = [x for x in np.ndindex(board_size, board_size) if self._game_board[x] == 0]
+        best_move = None, -float('Inf')
+        for move in valid_moves:
+            score = self._points_counter.count_move_points(move)
+            if score > best_move[1]:
+                best_move = move, score
+        return best_move[0]
