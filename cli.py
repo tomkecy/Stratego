@@ -54,7 +54,7 @@ class Cli:
         for i in range(self._board_size):
             print(' %i |' % i, end='')
         num = self._board_size + 1
-        print('\n' + ('-'*4*num))
+        print('\n' + ('-' * 4 * num))
         for i in range(self._board_size):
             print('%i ||' % i, end='')
             for j in range(self._board_size):
@@ -118,6 +118,8 @@ class Cli:
 
     def _initialise_game(self):
         self.engine = self.engine = game_engine.GameEngine(self._board_size)
-        self._ai_players = [LocalBestStrategy(self.engine.get_board()), AlphaBetaStrategy(2)]
-
-
+        self._ai_players = [
+            MiniMaxStrategy(3),
+            #OptimisedRandomStrategy(self.engine.get_board()),
+            AlphaBetaStrategy(6, 2),
+        ]

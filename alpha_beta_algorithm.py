@@ -4,9 +4,10 @@ import heuristic_evaluator
 
 
 class AlphaBetaStrategy:
-    def __init__(self, search_depth=None):
-        self._heuristic_evaluator = heuristic_evaluator.HeuristicEvaluator()
+    def __init__(self, player_index, search_depth=None):
+        self._heuristic_evaluator = heuristic_evaluator.MaxPointDiffHeuristic()
         self._search_depth = search_depth
+        self._player_index = player_index
 
     def make_move(self, game_state):
         alpha_move = None, -float('Inf')
@@ -16,7 +17,7 @@ class AlphaBetaStrategy:
     def _alpha_beta(self, game_state, depth, alpha_move, beta_move, max_turn, move=None):
         game_board, player_1_score, player_2_score = game_state
         if depth <= 0:
-            return move, self._heuristic_evaluator.evaluate_heuristic_score(game_state, move)
+            return move, self._heuristic_evaluator.evaluate_heuristic_score(game_state, move, self._player_index)
         if move is not None:
             game_board[move] = 1
 
