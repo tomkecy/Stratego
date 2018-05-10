@@ -13,10 +13,10 @@ class Cli:
         self.INPUT_RUN_AI_VS_AI = 2
         self.INPUT_EXIT = 3
 
-        self._board_size = 5
+        self._board_size = 8
 
         self.engine = game_engine.GameEngine(self._board_size)
-        self._ai_players = [AlphaBetaStrategy(self.engine.get_board(), 1), AlphaBetaStrategy(self.engine.get_board(), 1)]
+        self._ai_players = []
 
         self._current_player = 1
 
@@ -35,10 +35,12 @@ class Cli:
 
     def _run_ai_vs_ai(self):
         self._initialise_game()
+        self._current_player = 0
         while self.engine.is_game_over():
             print("----------\nPlayer 1 score: %s\nPlayer 2 score %s\n----------" % self.engine.get_player_points())
             self._print_board()
-            player_move = self._ai_players[self._current_player].make_move()
+            game_state = self.engine.get_game_state()
+            player_move = self._ai_players[self._current_player].make_move(game_state)
             self.engine.make_move(player_move)
 
             self._current_player = (self._current_player + 1) % 2
@@ -106,7 +108,8 @@ class Cli:
                     move = self._get_user_move()
                 self.engine.make_move(move)
             else:
-                ai_move = self._ai_players[0].make_move()
+                game_state = self.engine.get_game_state()
+                ai_move = self._ai_players[0].make_move(game_state)
                 self.engine.make_move(ai_move)
             self._current_player = (self._current_player + 1) % 2
 
@@ -115,6 +118,6 @@ class Cli:
 
     def _initialise_game(self):
         self.engine = self.engine = game_engine.GameEngine(self._board_size)
-        self._ai_players = [LocalBestStrategy(self.engine.get_board()), AlphaBetaStrategy(self.engine.get_board(), 1)]
+        self._ai_players = [LocalBestStrategy(self.engine.get_board()), AlphaBetaStrategy(2)]
 
 

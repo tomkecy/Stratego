@@ -4,30 +4,30 @@ import heuristic_evaluator
 
 
 class AlphaBetaStrategy:
-    def __init__(self, game_board=None, search_depth=None):
-        self._game_board = game_board
+    def __init__(self, search_depth=None):
         self._heuristic_evaluator = heuristic_evaluator.HeuristicEvaluator()
         self._search_depth = search_depth
 
-    def make_move(self):
+    def make_move(self, game_state):
         alpha_move = None, -float('Inf')
         beta_move = None, float('Inf')
-        return self._alpha_beta(self._game_board, self._search_depth, alpha_move, beta_move, True)[0]
+        return self._alpha_beta(game_state, self._search_depth, alpha_move, beta_move, True)[0]
 
-    def _alpha_beta(self, board, depth, alpha_move, beta_move, max_turn, move=None):
+    def _alpha_beta(self, game_state, depth, alpha_move, beta_move, max_turn, move=None):
+        game_board, player_1_score, player_2_score = game_state
         if depth <= 0:
-            return move, self._heuristic_evaluator.evaluate_heuristic_score(board, move)
+            return move, self._heuristic_evaluator.evaluate_heuristic_score(game_state, move)
         if move is not None:
-            board[move] = 1
+            game_board[move] = 1
 
         _, alpha = alpha_move
         _, beta = beta_move
-        board_size = len(self._game_board)
-        valid_moves = [x for x in np.ndindex(board_size, board_size) if self._game_board[x] == 0]
-        board_copy = np.copy(self._game_board)
+        board_size = len(game_board)
+        valid_moves = [x for x in np.ndindex(board_size, board_size) if game_board[x] == 0]
+        game_state_copy = np.copy(game_board), player_1_score, player_2_score
         if max_turn:
             for move in valid_moves:
-                _, score = self._alpha_beta(board_copy, depth - 1, alpha_move, beta_move, not max_turn, move)
+                _, score = self._alpha_beta(game_state_copy, depth - 1, alpha_move, beta_move, not max_turn, move)
                 if score > alpha:
                     alpha = score
                     alpha_move = move, alpha
@@ -36,7 +36,7 @@ class AlphaBetaStrategy:
             return alpha_move
         else:
             for move in valid_moves:
-                _, score = self._alpha_beta(board_copy, depth - 1, alpha_move, beta_move, not max_turn, move)
+                _, score = self._alpha_beta(game_state_copy, depth - 1, alpha_move, beta_move, not max_turn, move)
                 if score < beta:
                     beta = score
                     beta_move = move, beta

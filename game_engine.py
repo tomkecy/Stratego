@@ -19,6 +19,9 @@ class GameEngine:
     def get_board(self):
         return self._game_board
 
+    def get_game_state(self):
+        return self._game_board, self._player_1_points, self._player_2_points
+
     def make_move(self, location):
         if not self.is_valid_move(location):
             return False
