@@ -27,4 +27,7 @@ class WagedHeuristic:
         extra_score = 0
         if board[move[1], move[0]] != 0:
             extra_score = 0.5
-        return move_points + extra_score
+        if player == 1:
+            return player_1_score + move_points - player_2_score + extra_score
+        else:
+            return player_2_score + move_points - player_1_score + extra_score
