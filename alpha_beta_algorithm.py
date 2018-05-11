@@ -1,11 +1,9 @@
 import numpy as np
 
-import heuristic_evaluator
-
 
 class AlphaBetaStrategy:
-    def __init__(self, player_index, search_depth=None):
-        self._heuristic_evaluator = heuristic_evaluator.MaxPointDiffHeuristic()
+    def __init__(self, search_depth, heuristic_evaluator, player_index):
+        self._heuristic_evaluator = heuristic_evaluator
         self._search_depth = search_depth
         self._player_index = player_index
 

@@ -1,6 +1,8 @@
 import colorama
 import game_engine
 from colorama import Fore, Style
+
+import heuristic_evaluator
 from basic_game_algorithms import *
 from alpha_beta_algorithm import *
 from minimax_algorithm import *
@@ -12,7 +14,7 @@ class Cli:
         self.INPUT_RUN_PLAYER_VS_AI = 1
         self.INPUT_RUN_AI_VS_AI = 2
         self.INPUT_EXIT = 3
-
+        self._heuristic = heuristic_evaluator.MaxPointDiffHeuristic()
         self._board_size = 8
 
         self.engine = game_engine.GameEngine(self._board_size)
@@ -34,6 +36,40 @@ class Cli:
             user_input = self._get_user_input()
 
     def _run_ai_vs_ai(self):
+        self._ai_players.clear()
+        self._setup_ai_player(1)
+        self._setup_ai_player(2)
+
+        self._run_ai_vs_ai_game()
+
+    def _setup_ai_player(self, player_index):
+        print('Select %s AI algorithm:\n1. Minimax\n2. Alpha-Beta' % ('1st' if player_index == 1 else '2nd'))
+        selected_algorithm = self._get_user_input()
+        print('Enter search depth: ')
+        search_depth = self._get_user_input()
+        print('Select game heuristic:\n1. Basic\n2. Max point diff\n3. Waged')
+        selected_heuristic = self._get_user_input()
+
+        if selected_heuristic == 1:
+            heuristic = heuristic_evaluator.BasicHeuristic()
+        elif selected_heuristic == 2:
+            heuristic = heuristic_evaluator.MaxPointDiffHeuristic()
+        elif selected_heuristic == 3:
+            heuristic = heuristic_evaluator.WagedHeuristic()
+        else:
+            print('Invalid input!')
+            return False
+
+        if selected_algorithm == 1:
+            self._ai_players.append(MiniMaxStrategy(search_depth, heuristic, player_index))
+        elif selected_algorithm == 2:
+            self._ai_players.append(AlphaBetaStrategy(search_depth, heuristic, player_index))
+        else:
+            print('Invalid input!')
+            return False
+        return True
+
+    def _run_ai_vs_ai_game(self):
         self._initialise_game()
         self._current_player = 0
         while self.engine.is_game_over():
@@ -97,6 +133,17 @@ class Cli:
         print('----------\nMENU\n----------\n1. Player vs Computer\n2. Computer vs Computer\n3. Exit')
 
     def _run_player_vs_computer(self):
+        self._ai_players.clear()
+        print('Select AI algorithm:\n1. Minimax\n2. Alpha-Beta')
+        selected_algorithm = self._get_user_input()
+        print('Enter search depth: ')
+        search_depth = self._get_user_input()
+
+        if selected_algorithm == 1:
+            self._ai_players.append(MiniMaxStrategy(search_depth))
+        elif selected_algorithm == 2:
+            self._ai_players.append(AlphaBetaStrategy(search_depth, 2))
+
         self._initialise_game()
         while self.engine.is_game_over():
             print("----------\nPlayer 1 score: %s\nPlayer 2 score %s\n----------" % self.engine.get_player_points())
@@ -118,8 +165,4 @@ class Cli:
 
     def _initialise_game(self):
         self.engine = self.engine = game_engine.GameEngine(self._board_size)
-        self._ai_players = [
-            MiniMaxStrategy(3),
-            #OptimisedRandomStrategy(self.engine.get_board()),
-            AlphaBetaStrategy(6, 2),
-        ]
+        self._current_player = 1
