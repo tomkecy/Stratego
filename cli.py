@@ -13,7 +13,8 @@ class Cli:
         colorama.init()
         self.INPUT_RUN_PLAYER_VS_AI = 1
         self.INPUT_RUN_AI_VS_AI = 2
-        self.INPUT_EXIT = 3
+        self.INPUT_CHANGE_BOARD_SIZE = 3
+        self.INPUT_EXIT = 4
         self._heuristic = heuristic_evaluator.MaxPointDiffHeuristic()
         self._board_size = 8
 
@@ -30,10 +31,35 @@ class Cli:
                 self._run_player_vs_computer()
             elif user_input == self.INPUT_RUN_AI_VS_AI:
                 self._run_ai_vs_ai()
+            elif user_input == self.INPUT_CHANGE_BOARD_SIZE:
+                self._change_board_size()
             else:
                 print('Incorrect input!')
             self._print_menu()
             user_input = self._get_user_input()
+
+    def _run_player_vs_computer(self):
+        self._ai_players.clear()
+        self._setup_ai_player()
+
+        self._initialise_game()
+        while self.engine.is_game_over():
+            print("----------\nPlayer 1 score: %s\nPlayer 2 score %s\n----------" % self.engine.get_player_points())
+            self._print_board()
+            if self._current_player == 1:
+                move = self._get_user_move()
+                while not self.engine.make_move(move):
+                    print("Invalid move, try again")
+                    move = self._get_user_move()
+                self.engine.make_move(move)
+            else:
+                game_state = self.engine.get_game_state()
+                ai_move = self._ai_players[0].make_move(game_state)
+                self.engine.make_move(ai_move)
+            self._current_player = (self._current_player + 1) % 2
+
+        self._print_board()
+        self._print_end_game_summary()
 
     def _run_ai_vs_ai(self):
         self._ai_players.clear()
@@ -42,8 +68,15 @@ class Cli:
 
         self._run_ai_vs_ai_game()
 
-    def _setup_ai_player(self, player_index):
-        print('Select %s AI algorithm:\n1. Minimax\n2. Alpha-Beta' % ('1st' if player_index == 1 else '2nd'))
+    def _setup_ai_player(self, player_index=None):
+        if player_index is None:
+            ai_index_string = ''
+        elif player_index == 1:
+            ai_index_string = '1st '
+        else:
+            ai_index_string = '2nd '
+
+        print('Select %sAI algorithm:\n1. Minimax\n2. Alpha-Beta' % ai_index_string)
         selected_algorithm = self._get_user_input()
         print('Enter search depth: ')
         search_depth = self._get_user_input()
@@ -130,39 +163,14 @@ class Cli:
         return user_input
 
     def _print_menu(self):
-        print('----------\nMENU\n----------\n1. Player vs Computer\n2. Computer vs Computer\n3. Exit')
-
-    def _run_player_vs_computer(self):
-        self._ai_players.clear()
-        print('Select AI algorithm:\n1. Minimax\n2. Alpha-Beta')
-        selected_algorithm = self._get_user_input()
-        print('Enter search depth: ')
-        search_depth = self._get_user_input()
-
-        if selected_algorithm == 1:
-            self._ai_players.append(MiniMaxStrategy(search_depth))
-        elif selected_algorithm == 2:
-            self._ai_players.append(AlphaBetaStrategy(search_depth, 2))
-
-        self._initialise_game()
-        while self.engine.is_game_over():
-            print("----------\nPlayer 1 score: %s\nPlayer 2 score %s\n----------" % self.engine.get_player_points())
-            self._print_board()
-            if self._current_player == 1:
-                move = self._get_user_move()
-                while not self.engine.make_move(move):
-                    print("Invalid move, try again")
-                    move = self._get_user_move()
-                self.engine.make_move(move)
-            else:
-                game_state = self.engine.get_game_state()
-                ai_move = self._ai_players[0].make_move(game_state)
-                self.engine.make_move(ai_move)
-            self._current_player = (self._current_player + 1) % 2
-
-        self._print_board()
-        self._print_end_game_summary()
+        print('----------\nMENU\n----------\n1. Player vs Computer\n'
+              '2. Computer vs Computer\n3. Change board size\n4. Exit')
 
     def _initialise_game(self):
         self.engine = self.engine = game_engine.GameEngine(self._board_size)
         self._current_player = 1
+
+    def _change_board_size(self):
+        print('Enter board size: ')
+        user_input = self._get_user_input()
+        self._board_size = user_input

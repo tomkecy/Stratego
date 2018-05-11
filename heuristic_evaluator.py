@@ -14,11 +14,9 @@ class MaxPointDiffHeuristic:
         counter = points_counter.PointsCounter(board)
         move_points = counter.count_move_points(move)
         if player == 1:
-            #return player_1_score + move_points - player_2_score
-            return player_2_score + move_points - player_1_score
-        else:
-            #return player_2_score + move_points - player_1_score
             return player_1_score + move_points - player_2_score
+        else:
+            return player_2_score + move_points - player_1_score
 
 
 class WagedHeuristic:
