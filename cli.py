@@ -40,7 +40,8 @@ class Cli:
 
     def _run_player_vs_computer(self):
         self._ai_players.clear()
-        self._setup_ai_player()
+        if not self._setup_ai_player():
+            return
 
         self._initialise_game()
         while self.engine.is_game_over():
@@ -63,8 +64,8 @@ class Cli:
 
     def _run_ai_vs_ai(self):
         self._ai_players.clear()
-        self._setup_ai_player(1)
-        self._setup_ai_player(2)
+        if not self._setup_ai_player(1) or not self._setup_ai_player(2):
+            return
 
         self._run_ai_vs_ai_game()
 
