@@ -38,7 +38,7 @@ def print_end_game_summary(engine):
         print("Player %s won!" % winner)
 
 
-def run_ai_vs_ai(ai_players, board_size, out_file, first_search_depth, second_search_depth, start_player, stats):
+def run_ai_vs_ai(ai_players, board_size, out_file, first_search_depth, second_search_depth, start_player):
     engine = game_engine.GameEngine(board_size)
     current_player = start_player
     times = [0, 0]
@@ -64,9 +64,9 @@ def run_ai_vs_ai(ai_players, board_size, out_file, first_search_depth, second_se
 
 
 colorama.init()
-file = open('heuristics.csv', 'w')
+file = open('heuristics_1.csv', 'w')
 
-heuristics = [heuristic_evaluator.BasicHeuristic(), heuristic_evaluator.MaxPointDiffHeuristic(),
+heuristics = [#heuristic_evaluator.BasicHeuristic(), heuristic_evaluator.MaxPointDiffHeuristic(),
               heuristic_evaluator.WagedHeuristic()]
 
 max_depth = 3
@@ -81,8 +81,8 @@ for first_depth in range(1, max_depth + 1):
             for second_depth in range(1, max_depth + 1):
                 algorithms = [
                     AlphaBetaStrategy(search_depth=first_depth, heuristic_evaluator=first_heuristic, player_index=1),
-                    AlphaBetaStrategy(search_depth=second_depth, heuristic_evaluator=second_heuristic, player_index=2)]
-                points = run_ai_vs_ai(algorithms, 8, file, first_depth, second_depth, 0, winning_stats)
+                    AlphaBetaStrategy(search_depth=second_depth, heuristic_evaluator=second_heuristic, player_index=2, use_heuristic=True)]
+                points = run_ai_vs_ai(algorithms, 8, file, first_depth, second_depth, 0)
                 winner = 0
                 if points[0] > points[1]:
                     winner = 1
